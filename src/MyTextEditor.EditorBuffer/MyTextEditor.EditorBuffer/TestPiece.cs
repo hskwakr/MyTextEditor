@@ -39,5 +39,16 @@ namespace MyTextEditor.EditorBuffer
             Assert.False(piece.Equals(diffLength));
         }
 
+        [Fact]
+        public void Piece_CanInitialize_WithPiece()
+        {
+            var piece = new Piece(
+                PieceType.OriginalText, 0, 5);
+
+            var another = new Piece(piece);
+
+            Assert.IsType<Piece>(another);
+            Assert.Equal(piece, another);
+        }
     }
 }
