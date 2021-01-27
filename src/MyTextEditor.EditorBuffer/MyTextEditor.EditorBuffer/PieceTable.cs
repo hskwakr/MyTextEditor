@@ -1,0 +1,190 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Xunit;
+
+namespace MyTextEditor.EditorBuffer
+{
+    public class PieceTable
+    {
+        private OriginalText _original;
+        private AddedText _added;
+        private List<Piece> _table;
+
+        public PieceTable(string textSequence)
+        {
+            _original = new OriginalText(textSequence);
+            _added = new AddedText("");
+            _table = new List<Piece>();
+
+            this.Add(new Piece(
+                PieceType.OriginalText, 0, textSequence.Length));
+        }
+
+        public override string ToString()
+        {
+            string buffer = "";
+            foreach (var piece in _table)
+            {
+                switch (piece.Type)
+                {
+                    case PieceType.OriginalText:
+                        buffer += _original.Sequece.Substring(piece.Offset, piece.Length);
+                        break;
+                    case PieceType.AddedText:
+                        buffer += _added.Sequece.Substring(piece.Offset, piece.Length);
+                        break;
+                }
+            }
+
+            return buffer;
+        }
+
+        /// <summary>
+        /// Subtract pieces.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="minus"></param>
+        /// <returns>List of Pieces that is sorted by Offset</returns>
+        public List<Piece> Subtract(Piece from, Piece minus)
+        {
+            var result = new List<Piece>();
+
+            if (from == null || minus == null)
+            {
+                throw new Exception("Invalid arguments");
+            }
+
+            if (from.Type != minus.Type)
+            {
+                throw new Exception("Invalid arguments");
+
+            }
+
+            var nextOffset = minus.Offset + minus.Length;
+
+            result.Add(new Piece(
+                minus.Type, nextOffset, from.Length - nextOffset
+            ));
+
+            result.Add(new Piece(
+                from.Type, from.Offset, minus.Offset
+            ));
+
+            return result.OrderBy(p => p.Offset).ToList<Piece>();
+        }
+
+        public List<Piece> GetPieces()
+        {
+            return _table;
+        }
+
+        public bool Contains(Piece piece)
+        {
+            return _table.Contains(piece);
+        }
+
+        public int FindIndex(Piece piece)
+        {
+            return _table.IndexOf(piece);
+        }
+
+        public int FindIndex(int position)
+        {
+            if (position < 0)
+            {
+                return -1;
+            }
+
+            int sum = 0, index = 0;
+            foreach (var piece in _table)
+            {
+                sum += piece.Length;
+
+                if (sum >= position)
+                {
+                    return index;
+                }
+
+                index++;
+            }
+
+            return -1;
+        }
+
+        public void Insert(string add)
+        {
+            this.Add(new Piece(
+                PieceType.AddedText, _added.Sequece.Length, add.Length
+            ));
+            _added.Sequece += add;
+        }
+
+        public void Add(Piece piece)
+        {
+            _table.Add(piece);
+        }
+
+        /// <summary>
+        /// Remove string in table with position of table and length.
+        /// </summary>
+        /// <param name="startPosition">a specific position in piece table.</param>
+        /// <param name="length">a length of range which you want to remove</param>
+        public void Remove(int startPosition, int length)
+        {
+            var lastPosition = startPosition + length - 1;
+            var startIndex = this.FindIndex(startPosition);
+            var lastIndex = this.FindIndex(lastPosition);
+
+            int startOffset = 0, lastOffset = 0;
+            int counter = 0;
+            foreach (var piece in _table)
+            {
+                if (counter < startIndex)
+                {
+                    startOffset += piece.Length;
+                }
+
+                if (counter < lastIndex)
+                {
+                    lastOffset += piece.Length;
+                }
+                else
+                {
+                    break;
+                }
+
+                counter++;
+            }
+
+            var before = new Piece(
+                _table[startIndex].Type,
+                _table[startIndex].Offset,
+                startPosition - startOffset
+            );
+
+            var after = new Piece(
+                _table[lastIndex].Type,
+                _table[lastIndex].Offset + lastPosition - lastOffset + 1,
+                _table[lastIndex].Length - lastPosition + lastOffset - 1
+            );
+
+            var count = _table.Count(q =>{ 
+                var index = this.FindIndex(q);
+                return index >= startIndex && index <= lastIndex;
+            });
+            _table.RemoveRange(startIndex, count);
+
+            if (before.Length > 0)
+            {
+                _table.Insert(startIndex, before);
+            }
+
+            if (after.Length > 0)
+            {
+                _table.Insert(startIndex + 1, after);
+            }
+        }
+    }
+}
