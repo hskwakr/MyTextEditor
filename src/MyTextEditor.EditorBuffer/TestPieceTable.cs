@@ -129,6 +129,22 @@ namespace MyTextEditor.EditorBuffer
         }
 
         [Fact]
+        public void PieceTable_CanInsertMultipleTimes_AmongSequenceOfPiece()
+        {
+            var table = new PieceTable(TextSequence);
+            var add = "very ";
+
+            // case 1
+            table.Insert(7, add);
+            Assert.Equal("Hello, very nice to meet you.", table.ToString());
+
+            // case 2
+            add = "nice ";
+            table.Insert(17, add);
+            Assert.Equal("Hello, very nice nice to meet you.", table.ToString());
+        }
+
+        [Fact]
         public void PieceTable_CanAddPieceToTable()
         {
             var table = new PieceTable(TextSequence);
