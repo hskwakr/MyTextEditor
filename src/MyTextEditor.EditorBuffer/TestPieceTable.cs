@@ -145,6 +145,25 @@ namespace MyTextEditor.EditorBuffer
         }
 
         [Fact]
+        public void PieceTable_CanGetPiecesLengthSum()
+        {
+            var table = new PieceTable(TextSequence);
+            var add = "very ";
+
+            // case 1
+            Assert.Equal(0, table.GetOffset(0));
+
+            // case 2
+            table.Insert(7, add);
+            Assert.Equal(12, table.GetOffset(2));
+
+            // case 3
+            add = "nice ";
+            table.Insert(17, add);
+            Assert.Equal(22, table.GetOffset(4));
+        }
+
+        [Fact]
         public void PieceTable_CanAddPieceToTable()
         {
             var table = new PieceTable(TextSequence);

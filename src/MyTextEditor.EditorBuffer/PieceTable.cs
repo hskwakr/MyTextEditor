@@ -113,7 +113,7 @@ namespace MyTextEditor.EditorBuffer
 
         public void Insert(int startPosition, string add)
         {
-            var startIndex = this.FindIndex(startPosition);
+            var index = this.FindIndex(startPosition);
 
             var added = new Piece(
                PieceType.AddedText,
@@ -128,63 +128,75 @@ namespace MyTextEditor.EditorBuffer
             else if(startPosition == 0)
             {
                 var affected = new List<Piece>();
-                for (int i = startIndex; i < _table.Count; i++)
+                for (int i = index; i < _table.Count; i++)
                 {
                     affected.Add(_table[i]);
                 }
 
-                _table.RemoveRange(startIndex, _table.Count - startIndex);
+                _table.RemoveRange(index, _table.Count - index);
                 
                 this.Add(added);
                 _table.AddRange(affected);
             }
             else
             {
-                int startOffset = 0;
-                int counter = 0;
-                foreach (var piece in _table)
-                {
-                    if (counter < startIndex)
-                    {
-                        startOffset += piece.Length;
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                    counter++;
-                }
+                int offset = this.GetOffset(index);
 
                 var before = new Piece(
-                    _table[startIndex].Type,
-                    _table[startIndex].Offset,
-                    startPosition - startOffset);
+                    _table[index].Type,
+                    _table[index].Offset,
+                    startPosition - offset);
 
                 var after = new Piece(
-                    _table[startIndex].Type,
+                    _table[index].Type,
                     before.Offset + before.Length,
-                    _table[startIndex].Length - before.Length);
+                    _table[index].Length - before.Length);
 
                 if (added.Length > 0)
                 {
-                    _table.RemoveAt(startIndex);
+                    _table.RemoveAt(index);
 
                     if (before.Length > 0)
                     {
-                        _table.Insert(startIndex, before);
+                        _table.Insert(index, before);
                     }
 
-                    _table.Insert(startIndex + 1, added);
+                    _table.Insert(index + 1, added);
 
                     if (after.Length > 0)
                     {
-                        _table.Insert(startIndex + 2, after);
+                        _table.Insert(index + 2, after);
                     }
                 }
             }
 
             _added.Sequece += add;
+        }
+
+        /// <summary>
+        /// Calculate sum of length of piece in piece table until index. It doesn't contain a piece of index.
+        /// </summary>
+        /// <param name="index">A index of Piece table collection</param>
+        /// <returns></returns>
+        public int GetOffset(int index)
+        {
+            int result = 0, counter = 0;
+
+            foreach (var piece in _table)
+            {
+                if (counter < index)
+                {
+                    result += piece.Length;
+                }
+                else
+                {
+                    break;
+                }
+
+                counter++;
+            }
+
+            return result;
         }
 
         public void Add(Piece piece)
@@ -203,26 +215,8 @@ namespace MyTextEditor.EditorBuffer
             var startIndex = this.FindIndex(startPosition);
             var lastIndex = this.FindIndex(lastPosition);
 
-            int startOffset = 0, lastOffset = 0;
-            int counter = 0;
-            foreach (var piece in _table)
-            {
-                if (counter < startIndex)
-                {
-                    startOffset += piece.Length;
-                }
-
-                if (counter < lastIndex)
-                {
-                    lastOffset += piece.Length;
-                }
-                else
-                {
-                    break;
-                }
-
-                counter++;
-            }
+            int startOffset = this.GetOffset(startIndex);
+            int lastOffset = this.GetOffset(lastIndex);
 
             var before = new Piece(
                 _table[startIndex].Type,
