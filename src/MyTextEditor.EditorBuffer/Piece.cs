@@ -3,6 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MyTextEditor.EditorBuffer
 {
+    /// <summary>
+    /// This is a value object to represent a part of piece table
+    /// </summary>
     public class Piece : IEquatable<Piece>
     {
         public PieceType Type { get; }
