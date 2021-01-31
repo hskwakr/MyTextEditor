@@ -140,16 +140,31 @@ namespace MyTextEditor.EditorBuffer
             }
             else
             {
+                int startOffset = 0;
+                int counter = 0;
+                foreach (var piece in _table)
+                {
+                    if (counter < startIndex)
+                    {
+                        startOffset += piece.Length;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    counter++;
+                }
+
                 var before = new Piece(
                     _table[startIndex].Type,
                     _table[startIndex].Offset,
-                    startPosition);
+                    startPosition - startOffset);
 
                 var after = new Piece(
                     _table[startIndex].Type,
-                    startPosition,
-                    _table[startIndex].Length - startPosition);
-
+                    before.Offset + before.Length,
+                    _table[startIndex].Length - before.Length);
 
                 if (added.Length > 0)
                 {
