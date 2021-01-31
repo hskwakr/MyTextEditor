@@ -113,7 +113,7 @@ namespace MyTextEditor.EditorBuffer
 
         public void Insert(int startPosition, string add)
         {
-            var startIndex = this.FindIndex(startPosition);
+            var index = this.FindIndex(startPosition);
 
             var added = new Piece(
                PieceType.AddedText,
@@ -128,44 +128,44 @@ namespace MyTextEditor.EditorBuffer
             else if(startPosition == 0)
             {
                 var affected = new List<Piece>();
-                for (int i = startIndex; i < _table.Count; i++)
+                for (int i = index; i < _table.Count; i++)
                 {
                     affected.Add(_table[i]);
                 }
 
-                _table.RemoveRange(startIndex, _table.Count - startIndex);
+                _table.RemoveRange(index, _table.Count - index);
                 
                 this.Add(added);
                 _table.AddRange(affected);
             }
             else
             {
-                int startOffset = this.GetOffset(startIndex);
+                int offset = this.GetOffset(index);
 
                 var before = new Piece(
-                    _table[startIndex].Type,
-                    _table[startIndex].Offset,
-                    startPosition - startOffset);
+                    _table[index].Type,
+                    _table[index].Offset,
+                    startPosition - offset);
 
                 var after = new Piece(
-                    _table[startIndex].Type,
+                    _table[index].Type,
                     before.Offset + before.Length,
-                    _table[startIndex].Length - before.Length);
+                    _table[index].Length - before.Length);
 
                 if (added.Length > 0)
                 {
-                    _table.RemoveAt(startIndex);
+                    _table.RemoveAt(index);
 
                     if (before.Length > 0)
                     {
-                        _table.Insert(startIndex, before);
+                        _table.Insert(index, before);
                     }
 
-                    _table.Insert(startIndex + 1, added);
+                    _table.Insert(index + 1, added);
 
                     if (after.Length > 0)
                     {
-                        _table.Insert(startIndex + 2, after);
+                        _table.Insert(index + 2, after);
                     }
                 }
             }
