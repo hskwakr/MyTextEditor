@@ -140,21 +140,7 @@ namespace MyTextEditor.EditorBuffer
             }
             else
             {
-                int startOffset = 0;
-                int counter = 0;
-                foreach (var piece in _table)
-                {
-                    if (counter < startIndex)
-                    {
-                        startOffset += piece.Length;
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                    counter++;
-                }
+                int startOffset = this.GetOffset(startIndex);
 
                 var before = new Piece(
                     _table[startIndex].Type,
@@ -229,26 +215,8 @@ namespace MyTextEditor.EditorBuffer
             var startIndex = this.FindIndex(startPosition);
             var lastIndex = this.FindIndex(lastPosition);
 
-            int startOffset = 0, lastOffset = 0;
-            int counter = 0;
-            foreach (var piece in _table)
-            {
-                if (counter < startIndex)
-                {
-                    startOffset += piece.Length;
-                }
-
-                if (counter < lastIndex)
-                {
-                    lastOffset += piece.Length;
-                }
-                else
-                {
-                    break;
-                }
-
-                counter++;
-            }
+            int startOffset = this.GetOffset(startIndex);
+            int lastOffset = this.GetOffset(lastIndex);
 
             var before = new Piece(
                 _table[startIndex].Type,
