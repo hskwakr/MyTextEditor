@@ -113,11 +113,64 @@ namespace MyTextEditor.EditorBuffer
             return -1;
         }
 
-        public void Insert(string add)
+        public void Insert(int startPosition, string add)
         {
-            this.Add(new Piece(
-                PieceType.AddedText, _added.Sequece.Length, add.Length
-            ));
+            var startIndex = this.FindIndex(startPosition);
+
+            var added = new Piece(
+               PieceType.AddedText,
+               _added.Sequece.Length,
+               add.Length
+            );
+            
+            if (startPosition == _table.Select(p => p.Length).Sum())
+            {
+                this.Add(added);
+            }
+            else if(startPosition == 0)
+            {
+                var affected = new List<Piece>();
+                for (int i = startIndex; i < _table.Count; i++)
+                {
+                    affected.Add(_table[i]);
+                }
+
+                _table.RemoveRange(startIndex, _table.Count - startIndex);
+                
+                this.Add(added);
+                _table.AddRange(affected);
+            }
+            else
+            {
+                var before = new Piece(
+                    _table[startIndex].Type,
+                    _table[startIndex].Offset,
+                    startPosition);
+
+                var after = new Piece(
+                    _table[startIndex].Type,
+                    startPosition,
+                    _table[startIndex].Length - startPosition);
+
+
+                if (added.Length > 0)
+                {
+                    _table.RemoveAt(startIndex);
+
+                    if (before.Length > 0)
+                    {
+                        _table.Insert(startIndex, before);
+                    }
+
+                    _table.Insert(startIndex + 1, added);
+
+                    if (after.Length > 0)
+                    {
+                        _table.Insert(startIndex + 2, after);
+                    }
+                }
+            }
+
             _added.Sequece += add;
         }
 
