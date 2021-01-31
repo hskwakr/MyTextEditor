@@ -125,7 +125,6 @@ namespace MyTextEditor.EditorBuffer
             table = new PieceTable(TextSequence);
             table.Insert(7, add);
 
-            expected = add + TextSequence;
             Assert.Equal("Hello, very nice to meet you.", table.ToString());
         }
 
