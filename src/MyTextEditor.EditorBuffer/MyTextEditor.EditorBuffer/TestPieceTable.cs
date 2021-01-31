@@ -95,7 +95,7 @@ namespace MyTextEditor.EditorBuffer
 
             var add = " Hello, nice to meet you, too.";
             table = new PieceTable(TextSequence);
-            table.Insert(add);
+            table.Insert(TextSequence.Length, add);
             table.Remove(20, 25);
 
             var expected = TextSequence + add;
@@ -107,10 +107,25 @@ namespace MyTextEditor.EditorBuffer
         {
             var add = " Hello, nice to meet you, too.";
             var table = new PieceTable(TextSequence);
-            table.Insert(add);
+            table.Insert(TextSequence.Length, add);
 
+            // case 1
             var expected = TextSequence + add;
             Assert.Equal(expected, table.ToString());
+
+            // case 2
+            table = new PieceTable(TextSequence);
+            table.Insert(0, add);
+
+            expected = add + TextSequence;
+            Assert.Equal(expected, table.ToString());
+
+            // case 3
+            add = "very ";
+            table = new PieceTable(TextSequence);
+            table.Insert(7, add);
+
+            Assert.Equal("Hello, very nice to meet you.", table.ToString());
         }
 
         [Fact]
