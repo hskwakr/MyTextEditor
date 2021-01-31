@@ -187,6 +187,32 @@ namespace MyTextEditor.EditorBuffer
             _added.Sequece += add;
         }
 
+        /// <summary>
+        /// Calculate sum of length of piece in piece table until index. It doesn't contain a piece of index.
+        /// </summary>
+        /// <param name="index">A index of Piece table collection</param>
+        /// <returns></returns>
+        public int GetOffset(int index)
+        {
+            int result = 0, counter = 0;
+
+            foreach (var piece in _table)
+            {
+                if (counter < index)
+                {
+                    result += piece.Length;
+                }
+                else
+                {
+                    break;
+                }
+
+                counter++;
+            }
+
+            return result;
+        }
+
         public void Add(Piece piece)
         {
             _table.Add(piece);
