@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
-
-namespace MyTextEditor.EditorBuffer
+﻿namespace MyTextEditor.EditorBuffer
 {
     public abstract class TestEditorBufferStub
     {
